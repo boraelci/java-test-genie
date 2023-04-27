@@ -1,0 +1,5 @@
+You will be provided a Java class.
+Create syntactically and semantically correct, meaningful unit tests for the given class.
+Take hints from the package names in imports of the given class if you need to reference other classes.
+Do not forget package declaration and imports at the beginning, similar to the given class.
+In addition to built-in libraries and those referenced in the given class, you are only allowed to use JUnit and Mockito.

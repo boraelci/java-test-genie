@@ -1,0 +1,133 @@
+package com.ase.restservice.service;
+
+import com.ase.restservice.exception.AccountNotFoundException;
+import com.ase.restservice.exception.InvalidTransactionException;
+import com.ase.restservice.exception.ResourceNotFoundException;
+import com.ase.restservice.exception.ResourceAlreadyExistsException;
+
+import com.ase.restservice.model.Account;
+import com.ase.restservice.model.Asset;
+import com.ase.restservice.model.AssetId;
+
+import com.ase.restservice.model.Stock;
+import com.ase.restservice.model.Cryptocurrency;
+import com.ase.restservice.model.NFT;
+
+import com.ase.restservice.repository.AccountRepository;
+import com.ase.restservice.repository.AssetRepository;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+public class AssetServiceTest {
+
+  @InjectMocks
+  private AssetService assetService;
+
+  @Mock
+  private AssetRepository assetRepository;
+
+  @Mock
+  private AccountRepository accountRepository;
+
+  @Mock
+  private StockService stockService;
+
+  @Mock
+  private CryptocurrencyService cryptocurrencyService;
+
+  @Mock
+  private NFTService nftService;
+
+  private Asset sampleAsset;
+  private Stock sampleStock;
+  private Cryptocurrency sampleCryptocurrency;
+  private NFT sampleNFT;
+
+  @BeforeEach
+  public void setUp() {
+    sampleAsset = new Asset("account1", "stock", "t1", 10f);
+    sampleStock = new Stock("t1", "Apple Inc.", 150f);
+    sampleCryptocurrency = new Cryptocurrency("t2", "Bitcoin", 10000f);
+    sampleNFT = new NFT("t3", "CryptoPunk", "420", 19.99f);
+  }
+
+  @Test
+  public void createAsset_Success() throws ResourceAlreadyExistsException {
+    Mockito.when(assetRepository.existsById(sampleAsset.getAssetId())).thenReturn(false);
+    Mockito.when(assetRepository.save(sampleAsset)).thenReturn(sampleAsset);
+
+    Asset result = assetService.createAsset(sampleAsset);
+
+    Mockito.verify(assetRepository, Mockito.times(1)).existsById(sampleAsset.getAssetId());
+    Mockito.verify(assetRepository, Mockito.times(1)).save(sampleAsset);
+    assert (result.equals(sampleAsset));
+  }
+
+  @Test
+  public void updateAsset_Success() throws ResourceNotFoundException {
+    Mockito.when(assetRepository.existsById(sampleAsset.getAssetId())).thenReturn(true);
+    Mockito.when(assetRepository.save(sampleAsset)).thenReturn(sampleAsset);
+
+    Asset result = assetService.updateAsset(sampleAsset);
+
+    Mockito.verify(assetRepository, Mockito.times(1)).existsById(sampleAsset.getAssetId());
+    Mockito.verify(assetRepository, Mockito.times(1)).save(sampleAsset);
+    assert (result.equals(sampleAsset));
+  }
+
+  @Test
+  public void deleteAssetById_Success() throws ResourceNotFoundException {
+    Mockito.when(assetRepository.findById(sampleAsset.getAssetId())).thenReturn(Optional.of(sampleAsset));
+
+    assetService.deleteAssetById(sampleAsset.getAssetId());
+
+    Mockito.verify(assetRepository, Mockito.times(1)).findById(sampleAsset.getAssetId());
+    Mockito.verify(assetRepository, Mockito.times(1)).deleteById(sampleAsset.getAssetId());
+  }
+
+  @Test
+  public void getAssetById_Success() throws ResourceNotFoundException {
+    Mockito.when(assetRepository.findById(sampleAsset.getAssetId())).thenReturn(Optional.of(sampleAsset));
+
+    Asset result = assetService.getAssetById(sampleAsset.getAssetId());
+
+    Mockito.verify(assetRepository, Mockito.times(1)).findById(sampleAsset.getAssetId());
+    assert (result.equals(sampleAsset));
+  }
+
+  @Test
+  public void listAssets_Success() {
+    List<Asset> assets = Arrays.asList(sampleAsset);
+    Mockito.when(accountRepository.findAllforClient("username")).thenReturn(assets);
+
+    List<Asset> result = assetService.listAssets("");
+
+    Mockito.verify(accountRepository, Mockito.times(1)).findAllforClient("username");
+    assert (result.equals(assets));
+  }
+
+  @Test
+  public void listAssetsByType_Success() {
+    List<Asset> assets = Arrays.asList(sampleAsset);
+    Mockito.when(assetRepository.findAllAssetsByTradableType("stock")).thenReturn(assets);
+
+    List<Asset> result = assetService.listAssetsByType("", "stock");
+
+    Mockito.verify(assetRepository, Mockito.times(1)).findAllAssetsByTradableType("stock");
+    assert (result.equals(assets));
+  }
+
+  // More tests needed for other methods
+
+}

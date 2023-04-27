@@ -1,0 +1,15 @@
+You will be provided a JSON file that is a parsed Java class, in the following form.
+	identifier: string, class name
+	superclass: string, superclass definition
+	interfaces: string, interface definition
+	fields: list, class fields
+	methods: list, class methods
+	file: string, relative path (inside the repository) to file containing the focal class
+
+Your task is to create syntactically and semantically correct, meaningful unit tests for this class. Respond with JSON in the following format.
+	identifier: class identifier suffixed with 'Test'
+	file: similar path but 'main' replaced with 'test'
+	content: test file content that has unit tests
+
+Take hints from the package names in imports of the given class if you need to reference other classes.
+In addition to built-in libraries and those referenced in the given class, you are only allowed to use JUnit and Mockito.
