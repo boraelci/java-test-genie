@@ -10,8 +10,9 @@ class GptWrapper:
 
     def query(self, message):
         openai.api_key = os.environ["OPENAI_API_KEY"]
-        # model = "gpt-4-0314"
-        model = "gpt-3.5-turbo-0301"
+        # model = "gpt-4"
+        model = "gpt-3.5-turbo"
+        temperature = 0
         input_token_count = self.get_input_token_count(model, message)
         max_tokens = min(2048, 3900 - input_token_count)
         response = openai.ChatCompletion.create(
@@ -21,6 +22,7 @@ class GptWrapper:
                 {"role": "user", "content": message},
             ],
             max_tokens=max_tokens,
+            temperature=temperature,
         )
         content = response["choices"][0]["message"]["content"]
         return content

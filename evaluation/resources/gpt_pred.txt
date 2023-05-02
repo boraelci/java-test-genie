@@ -1,0 +1,27 @@
+@Test
+public void testExecute() throws Exception {
+    String inputField = "inputField";
+    String targetField = "targetField";
+    RosetteApiWrapper apiWrapper = mock(RosetteApiWrapper.class);
+    String processorType = "processorType";
+    String tag = "tag";
+    String description = "description";
+    
+    IngestDocument documentWithInputField = new IngestDocument();
+    documentWithInputField.setFieldValue(inputField, "Input Text");
+    
+    IngestDocument documentWithTargetField = new IngestDocument();
+    documentWithTargetField.setFieldValue(targetField, "Target Field Value");
+    
+    RosetteAbstractProcessor processor = new RosetteAbstractProcessor(
+      apiWrapper, tag, description, processorType, inputField, targetField);
+    
+    IngestDocument processedDocument = processor.execute(documentWithInputField);
+    
+    assertNull(processedDocument.hasField(targetField));
+    
+    processedDocument = processor.execute(documentWithTargetField);
+    
+    assertTrue(processedDocument.hasField(targetField));
+    assertEquals(processorType, processedDocument.getFieldValue(targetField, String.class));
+}

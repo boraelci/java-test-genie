@@ -1,0 +1,4 @@
+Avg. BLEU score: 0.04883918522951925
+Avg. CodeBLEU score: 0.16801233646827585
+Predictions count:  100
+Failures count:  0
