@@ -14,6 +14,8 @@ class GptWrapper:
         model = "gpt-3.5-turbo"
         temperature = 0
         input_token_count = self.get_input_token_count(model, message)
+        if input_token_count > 3900:
+            raise Exception("Error: this file is too large")
         max_tokens = min(2048, 3900 - input_token_count)
         response = openai.ChatCompletion.create(
             model=model,
