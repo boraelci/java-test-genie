@@ -2,8 +2,9 @@
 
 import argparse
 import json
-import platform
 import os
+import platform
+import re
 import sys
 
 from genie.parsers.ClassParser import ClassParser
@@ -12,7 +13,7 @@ from genie.wrappers.GptWrapper import GptWrapper
 
 SINGLE_FILE = False
 SINGLE_FILE_NAME = "AssetService.java"
-LOCAL_RESPONSE = False
+LOCAL_RESPONSE = True
 
 
 def save_test(repo_test_path, test_content):
@@ -20,7 +21,7 @@ def save_test(repo_test_path, test_content):
     os.makedirs(repo_test_dir, exist_ok=True)
     with open(repo_test_path, "w") as f:
         f.write(test_content)
-    print(f"Saved")
+    print(f"Saved tests to {repo_test_path}")
 
 
 def gpt_raw_classes(genie_dir, repo_dir, selected_class_paths):
@@ -32,15 +33,22 @@ def gpt_raw_classes(genie_dir, repo_dir, selected_class_paths):
         if SINGLE_FILE is True and class_name_java != SINGLE_FILE_NAME:
             continue
 
-        print(f"Generating tests for {class_name_java}")
+        print(f"\nGenerating tests for {class_name_java}...")
         if LOCAL_RESPONSE is True:
             with open(f"{genie_dir}/resources/gpt_response_for_raw.txt", "r") as f:
                 response = f.read()
         else:
             with open(class_path, "r") as f:
                 content = f.read()
-            response = gpt.query(content)
+            try:
+                response = gpt.query(content)
+                print(f"Succesfully generated tests for {class_name_java}")
+            except Exception as e:
+                print(e)
+                print(f"Failed to generate tests for {class_name_java}")
+                continue
 
+        response = re.sub(r"^```$\n?", "", response, flags=re.MULTILINE)
         test_name = class_name + "Test"
         test_path = class_path.replace('src/main', 'src/test')
         test_path = test_path.replace(f"{class_name}.java", f"{test_name}.java")
@@ -56,8 +64,6 @@ def gpt_raw_classes(genie_dir, repo_dir, selected_class_paths):
                 print(f"Discarded")
         else:
             save_test(repo_test_path, test_content)
-
-        break
 
 
 def gpt_parsed_classes(genie_dir, repo_dir, tmp_repo_out_dir):
@@ -102,9 +108,6 @@ def gpt_parsed_classes(genie_dir, repo_dir, tmp_repo_out_dir):
         else:
             save_test(repo_test_path, test_content)
 
-        # print(response)
-        break
-
 
 def main():
     # args = parse_args()
@@ -115,12 +118,22 @@ def main():
         repo_name = repo_dir.split("/")[-1]
         os.chdir(repo_dir)
     config_path = f"{repo_dir}/.genie.json"
+
+    # Check config file exists
+    if not os.path.exists(config_path):
+        print(
+            f"Error: .genie.json file cannot be found at {config_path}; follow instructions in our README to create one"
+        )
+        sys.exit(1)
     config_parser = ConfigParser(config_path)
+
+    # Check directory is correct
     if "src" not in os.listdir():
         print("Error: src folder cannot be found in the current directory")
         sys.exit(1)
     genie_dir = os.path.dirname(os.path.realpath(__file__))
 
+    # Select grammar file depending on OS
     os_system = platform.system()
     if os_system == "Darwin":
         grammar_file = f"{genie_dir}/resources/libtree-sitter-java.dylib"

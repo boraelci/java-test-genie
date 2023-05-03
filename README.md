@@ -1,14 +1,16 @@
 # JavaTestGenie
+![MIT License](https://img.shields.io/github/license/boraelci/review-master)
+[![PyPI](https://img.shields.io/pypi/v/java-test-genie)](https://pypi.org/project/java-test-genie/)
 
 ## Installation
 
 ```bash
-pip3 install java-test-genie
+pip install java-test-genie
 ```
 
 ## Usage
 
-Set your OpenAI API key with `export OPENAI_API_KEY=<API-KEY-HERE>`. You can obtain it at https://platform.openai.com/account/api-keys
+Before running `genie`, set your OpenAI API key with `export OPENAI_API_KEY=<API-KEY-HERE>`. You can obtain it at https://platform.openai.com/account/api-keys
 
 Ensure that you are in a at the same level with `src/` when running the tool.
 
@@ -51,7 +53,7 @@ Here is an example repo that you can use the config file above with.
 
 Parsing Java files with the Tree-sitter library requires grammar files. They were obtained in the following way for this tool.
 
-### For Mac
+### For macOS
 
 ```bash
 git clone https://github.com/tree-sitter/tree-sitter-java.git

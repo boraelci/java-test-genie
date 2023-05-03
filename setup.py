@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 
+from genie import __version__
 from setuptools import setup, find_packages
+
+with open("README.md", "r", encoding="utf-8") as f:
+    long_description = f.read()
 
 setup(
     name='java-test-genie',
-    version='0.1.0',
+    version=__version__,
     description='AI-Driven Unit Test Generation for Java',
     author='Bora Elci',
     author_email='bora.elci@columbia.edu',
@@ -14,4 +18,6 @@ setup(
     ],
     packages=find_packages(),
     entry_points={'console_scripts': ['genie = genie.main:main']},
+    long_description=long_description,
+    long_description_content_type="text/markdown",
 )
