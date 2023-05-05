@@ -9,6 +9,8 @@ class GptWrapper:
             self.system_prompt = f.read()
 
     def query(self, message):
+        # print("submitting")
+        # print(message)
         openai.api_key = os.environ["OPENAI_API_KEY"]
         # model = "gpt-4"
         model = "gpt-3.5-turbo"
